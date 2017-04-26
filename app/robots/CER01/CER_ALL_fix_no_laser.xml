@@ -4,6 +4,9 @@
 <robot name="CER01" build="1" portprefix="cer">
     <params file="hardware/electronics/pc104.xml" />
 
+    <!-- SELF COLLISION AVOIDANCE -->
+    <devices file="hardware/motorControl/cer_safe-mc.xml" />
+    
     <!-- MOBILE BASE -->
     <devices file="hardware/motorControl/cer_base-ems21-mc.xml" />
     <devices file="wrappers/motorControl/cer_base-mc_wrapper.xml" />

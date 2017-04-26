@@ -23,6 +23,7 @@
           <elem name="SecondSetOfJoints"> cer_right_wrist_equivalent_mc</elem>
           <elem name="YawSetOfJoints">    cer_right_lower_arm_mc</elem>
  <!--	  <elem name="HandSetOfJoints">   cer_right_hand_mc </elem> -->
+          <elem name="SelfCollisionCheck"> cer_safe_mc </elem>
 	  </paramlist>
       </action>
 

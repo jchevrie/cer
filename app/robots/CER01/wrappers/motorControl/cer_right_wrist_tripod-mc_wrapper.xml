@@ -17,7 +17,7 @@
 	  <paramlist name="networks">
 	  <!-- The param value must match the device name in the corresponding emsX file -->
 	      <elem name="FirstSetOfJoints"> cer_right_lower_arm_mc  </elem>
-
+          <elem name="SelfCollisionCheck"> cer_safe_mc </elem>
 	  </paramlist>
       </action>
 
