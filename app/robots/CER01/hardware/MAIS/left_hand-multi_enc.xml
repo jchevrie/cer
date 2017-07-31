@@ -11,5 +11,9 @@
         </group>
     </device> 
     
+    <group name ="ROS">
+       <param name ="joint_names"> l_hand_paddle_distal_joint l_hand_paddle_proximal_joint l_dummy_1 l_hand_thumb_proximal_joint l_hand_thumb_distal_joint l_dummy_2 </param>
+    </group>
+
 </devices>
 

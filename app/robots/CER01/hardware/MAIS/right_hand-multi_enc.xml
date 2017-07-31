@@ -10,6 +10,9 @@
             <param name="encoderConversionFactor"> -182.044 182.044 1.0 -182.044 182.044 1.0 </param>
         </group>
     </device> 
-    
+ 
+     <group name ="ROS">
+       <param name ="joint_names"> r_hand_paddle_distal_joint r_hand_paddle_proximal_joint r_dummy_1 r_hand_thumb_distal_joint r_hand_thumb_proximal_joint r_dummy_2 </param>
+    </group>   
 </devices>
 
