@@ -12,6 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <stdio.h>
 #include "r1face_mic.h"
 #include "CircularBuffer.h"
 #include <yarp/os/Time.h>
@@ -42,9 +43,11 @@ struct inputData {
 
 
 R1faceMic::R1faceMic(): PeriodicThread(0),
+                        singleChannel(false),
+                        selectedChannel(-1),
                         shift(8),
                         recording(false),
-                        channels(HW_STEREO_CHANNELS),
+                        userChannelsNum(HW_STEREO_CHANNELS-1),
                         samplingRate(SAMPLING_RATE),
                         dev_fd(-1),
                         chunkSize(CHUNK_SIZE),
@@ -71,6 +74,26 @@ bool R1faceMic::open(yarp::os::Searchable &params)
 
     shift = params.check("shift", yarp::os::Value(8)).asInt();
 
+    singleChannel = params.check("channel");
+    if(singleChannel)
+    {
+        selectedChannel = params.find("channel").asInt32();
+        if( (selectedChannel <= 0) || (selectedChannel >= HW_STEREO_CHANNELS) )
+        {
+            yError() << "Requested channel do not exists. Available channels are from 0 to " << HW_STEREO_CHANNELS-2;
+            return false;
+        }
+        userChannelsNum = 1;
+        selectedChannel++;  // real channels nums goes from 1 to 8; 0 is skipped
+    }
+
+    if(params.check("help"))
+    {
+        yInfo() << "audioDevice : device file to open. [string]";
+        yInfo() << "channel <n> : use ONLY channel <n>. [int]  if missing, use all channels instead (default)";
+        return false;
+    }
+
     dev_fd = ::open(deviceFile.c_str(), O_RDONLY);
     if (dev_fd < 0)
     {
@@ -83,6 +106,8 @@ bool R1faceMic::open(yarp::os::Searchable &params)
 
     yDebug() << "Input configuration is " << params.toString();
     yInfo()  << "R1faceMic device opened, starting thread";
+    yInfo()  << "Using channel " << selectedChannel;
+
     return start();
 }
 
@@ -136,7 +161,7 @@ bool R1faceMic::getSound(yarp::sig::Sound& sound)
     }
 
     int chunksInBuffer = inputBuffer->size();
-    sound.resize(chunkSize * chunksInBuffer, channels-1);
+    sound.resize(chunkSize * chunksInBuffer, userChannelsNum);
     sound.setFrequency(samplingRate);
     sound.clear();
 
@@ -150,17 +175,30 @@ bool R1faceMic::getSound(yarp::sig::Sound& sound)
         rawBuffer =  tmpChunk.data;
 
         int ch = 0;     // stereo channel, from 0 to 9
-        int j  = 9;     // selector to choose right channels only. Jumps of (channels * STEREO)
+        int j;          // selector to choose right channels only. Jumps of (channels * STEREO)
                         // for all data until the chunk is over
-        int sx = 0;     // sample inside the chunk, goes from 0 to chunkSize
+        int sample = 0; // sample inside the chunk, goes from 0 to chunkSize
 
-        // Only right channels are connected to a microphone, so skip left channels
-        for (j=9; j< chunkSize *(channels * STEREO); j+=(channels * STEREO), sx++)
+        // N.B. first channels are the left ones.
+        if(singleChannel)
         {
-            for (ch=1; ch<HW_STEREO_CHANNELS; ch++)     // skip the ch0, we don't like it
+            //  get the desired channel; only right ones are connected, so skip left ones anyway
+            for (j=HW_STEREO_CHANNELS; j< chunkSize *(HW_STEREO_CHANNELS * STEREO); j+=(HW_STEREO_CHANNELS * STEREO), sample++)
             {
-                tmp = rawBuffer[ch+j] >> shift;
-                sound.set(tmp, sx+ (chunk*chunkSize), ch-1);
+                tmp = rawBuffer[j+selectedChannel] >> shift;
+                sound.set(tmp, sample + (chunk*chunkSize), 0);
+            }
+        }
+        else
+        {
+            // Only right channels are connected to a microphone, so skip left channels
+            for (j=HW_STEREO_CHANNELS; j< chunkSize *(HW_STEREO_CHANNELS * STEREO); j+=(HW_STEREO_CHANNELS * STEREO), sample++)
+            {
+                for (ch=1; ch<HW_STEREO_CHANNELS; ch++)     // skip the ch0, we don't like it
+                {
+                    tmp = rawBuffer[ch+j] >> shift;
+                    sound.set(tmp, sample + (chunk*chunkSize), ch-1);
+                }
             }
         }
     }

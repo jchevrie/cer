@@ -98,9 +98,11 @@ public:
 
 private:
 
+    bool singleChannel;
+    int  selectedChannel;
     int  shift;
     bool recording;
-    int  channels;
+    int  userChannelsNum;
     int  samplingRate;
     int  dev_fd;
     int  chunkSize;
