@@ -5,4 +5,5 @@
 if(IPOPT_FOUND)
     add_subdirectory(solver)
     add_subdirectory(controller)
+    add_subdirectory(collision-detection)
 endif()
