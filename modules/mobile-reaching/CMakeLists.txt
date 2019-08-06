@@ -5,4 +5,6 @@
 if(IPOPT_FOUND)
     add_subdirectory(solver)
     add_subdirectory(controller)
+    add_subdirectory(trajectory-controller)
+    add_subdirectory(trajectory-planner)
 endif()

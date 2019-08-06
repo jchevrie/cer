@@ -157,7 +157,8 @@ namespace configuration {
         heave,
         no_torso_no_heave,
         no_torso_heave,
-        torso_yaw_no_heave
+        torso_yaw_no_heave,
+        no_base_no_torso_no_heave_plan
     };
 };
 
