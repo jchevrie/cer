@@ -22,6 +22,7 @@
 //#include <cmath>
 
 #include "Matrix.h"
+#include "exception"
 
 namespace cer
 {
@@ -111,7 +112,8 @@ namespace cer
 				if (a == 0.0)
 				{
 					printf("Vec3::operator/(0.0) ERROR\n");
-					exit(-1);
+                    throw std::exception();
+                    //exit(-1);
 				}
 
 				a = 1.0 / a;
@@ -124,7 +126,8 @@ namespace cer
 				if (a == 0.0)
 				{
 					printf("Vec3::operator/=(0.0) ERROR\n");
-					exit(-1);
+                    throw std::exception();
+                    //exit(-1);
 				}
 
 				a = 1.0 / a;
